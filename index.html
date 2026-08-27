@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>sn8ks</title>
+    <style>
+      html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #000; }
+      body { display: grid; place-items: center; }
+      canvas { display: block; width: 100vw; height: 100vh; outline: none; image-rendering: pixelated; }
+      #poster {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        background: #000;
+        font-family: ui-monospace, "Cascadia Mono", "DejaVu Sans Mono", monospace;
+        cursor: default;
+      }
+      #poster.ready { cursor: pointer; }
+      #poster-card { display: grid; justify-items: center; gap: 1.5rem; }
+      #cover-art {
+        width: min(68vw, 32rem);
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        border: 1px solid #333;
+        background: #080808;
+      }
+      h1 {
+        position: absolute;
+        margin: 0;
+        font-size: clamp(3rem, 14vw, 9rem);
+        letter-spacing: .08em;
+      }
+      #start {
+        padding: .7rem 1.2rem;
+        color: #fff;
+        border: 1px solid #777;
+        background: #111;
+        font: inherit;
+      }
+      #start:disabled { color: #777; border-color: #333; }
+      #store-links a { color: #aaa; }
+      #store-links a:hover, #store-links a:focus { color: #fff; }
+    </style>
+  <link rel="modulepreload" href="/sn8ks-77d519f458610914.js" crossorigin="anonymous" integrity="sha384-a/PFtFeEmhVTkdMSGjKC9EaxEzVMA0rAum0MHWq6A9N8c1iKNafrLtmAeN4vufUV"><link rel="preload" href="/sn8ks-77d519f458610914_bg.wasm" crossorigin="anonymous" integrity="sha384-sEJdWwnropDckP9ppK5cnx84wImqpvTfTVEcgJNuEBgsvp8lhccdTjiAfcSOLU8w" as="fetch" type="application/wasm"></head>
+  <body>
+    <main id="poster" aria-live="polite">
+      <section id="poster-card">
+        <!-- Cover art placeholder — Gareth supplies the asset. -->
+        <img id="cover-art" alt="">
+        <h1>sn8ks</h1>
+        <button id="start" type="button" disabled>loading…</button>
+        <nav id="store-links" aria-label="Store links"><a href="downloads/">downloads</a></nav>
+      </section>
+    </main>
+    
+    
+<script type="module">
+import init, * as bindings from '/sn8ks-77d519f458610914.js';
+const wasm = await init({ module_or_path: '/sn8ks-77d519f458610914_bg.wasm' });
+
+
+window.wasmBindings = bindings;
+
+
+dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
+
+</script>
+    <script>
+      const poster = document.querySelector("#poster");
+      const startButton = document.querySelector("#start");
+      let armed = false;
+      let started = false;
+      let bindingPoll;
+
+      function arm() {
+        if (started || typeof window.wasmBindings?.start !== "function") return;
+        armed = true;
+        poster.classList.add("ready");
+        startButton.disabled = false;
+        startButton.textContent = "click to start";
+        clearInterval(bindingPoll);
+      }
+
+      function start(event) {
+        if (!armed || started) return;
+        if (event.type === "click" && event.target.closest("a")) return;
+        if (event.type === "keydown" && event.repeat) return;
+        started = true;
+        armed = false;
+        startButton.disabled = true;
+        poster.removeEventListener("click", start);
+        window.removeEventListener("keydown", start);
+
+        const startedAt = performance.now();
+        const focusCanvas = new MutationObserver(() => {
+          const canvas = document.querySelector("canvas");
+          if (canvas) {
+            canvas.focus();
+            focusCanvas.disconnect();
+          }
+        });
+        focusCanvas.observe(document.body, { childList: true });
+        const BrowserAudioContext = window.AudioContext || window.webkitAudioContext;
+        if (BrowserAudioContext) {
+          try {
+            const activationContext = new BrowserAudioContext();
+            activationContext.resume().then(() => activationContext.close());
+          } catch (error) {
+            console.warn("sn8ks audio activation anchor failed", error);
+          }
+        }
+        window.wasmBindings.start();
+        poster.remove();
+        const canvas = document.querySelector("canvas");
+        if (canvas) {
+          canvas.focus();
+          focusCanvas.disconnect();
+        }
+        console.log(`sn8ks click → start() returned: ${(performance.now() - startedAt).toFixed(1)}ms`);
+      }
+
+      window.addEventListener("TrunkApplicationStarted", arm, { once: true });
+      poster.addEventListener("click", start);
+      window.addEventListener("keydown", start);
+      bindingPoll = setInterval(arm, 50);
+      arm();
+    </script>
+  </body>
+</html>

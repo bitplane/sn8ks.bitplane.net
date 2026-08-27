@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Download sn8ks</title>
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      body {
+        min-height: 100vh;
+        margin: 0;
+        display: grid;
+        place-items: center;
+        color: #eee;
+        background: #080a0d;
+        font-family: ui-monospace, "Cascadia Mono", "DejaVu Sans Mono", monospace;
+      }
+      main { width: min(42rem, calc(100% - 2rem)); padding: 3rem 0; }
+      h1 { margin: 0 0 .4rem; font-size: clamp(2.5rem, 12vw, 5rem); }
+      p { color: #aeb7c2; line-height: 1.6; }
+      ul { margin: 2rem 0; padding: 0; list-style: none; }
+      li + li { margin-top: .75rem; }
+      a {
+        display: block;
+        padding: 1rem 1.2rem;
+        color: #fff;
+        border: 1px solid #35404c;
+        background: #11171d;
+        text-decoration: none;
+      }
+      a:hover, a:focus { border-color: #31cc78; background: #15221b; outline: none; }
+      small { display: block; margin-top: .35rem; color: #8e9aa7; }
+      footer a { display: inline; padding: 0; border: 0; background: none; color: #8fdcaf; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>sn8ks</h1>
+      <p>Download the latest release. These builds are not distributed through platform stores, so your device may ask you to confirm that you trust them.</p>
+      <ul>
+        <li>
+          <a href="sn8ks-linux-x86_64.zip" download>
+            Linux · x86_64
+            <small>Terminal and windowed game</small>
+          </a>
+        </li>
+        <li>
+          <a href="sn8ks-windows-x86_64.zip" download>
+            Windows · x86_64
+            <small>Windowed game</small>
+          </a>
+        </li>
+        <li>
+          <a href="sn8ks-android-arm64.apk" download>
+            Android · arm64
+            <small>Sideloadable APK · Android 8 or newer</small>
+          </a>
+        </li>
+      </ul>
+      <footer><a href="/">Play in your browser</a></footer>
+    </main>
+  </body>
+</html>
